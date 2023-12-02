@@ -6,20 +6,32 @@ func Test_run(t *testing.T) {
 	run()
 }
 
-func Test_trebuchet_part_1(t *testing.T) {
-	result := trebuchet_part_1([]string{
-		"1abc2",
-		"pqr3stu8vwx",
-		"a1b2c3d4e5f",
-		"treb7uchet",
-	})
-
-	if result != 142 {
-		t.Fatalf("result should be equal to 142 and not %d", result)
+func Test_trebuchetPart1(t *testing.T) {
+	type args struct {
+		input []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "example", args: args{[]string{
+			"1abc2",
+			"pqr3stu8vwx",
+			"a1b2c3d4e5f",
+			"treb7uchet"},
+		}, want: 142},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := trebuchetPart1(tt.args.input); got != tt.want {
+				t.Errorf("trebuchetPart1() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
-func Test_trebuchet_part_2(t *testing.T) {
+func Test_trebuchetPart2(t *testing.T) {
 	type args struct {
 		input []string
 	}
@@ -54,7 +66,7 @@ func Test_trebuchet_part_2(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := trebuchet_part_2(tt.args.input); got != tt.want {
+			if got := trebuchetPart2(tt.args.input); got != tt.want {
 				t.Errorf("trebuchet_part_2() = %v, want %v", got, tt.want)
 			}
 		})
