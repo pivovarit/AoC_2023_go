@@ -1,35 +1,19 @@
 package day1
 
 import (
-	"bufio"
-	"log"
-	"os"
+	"github.com/pivovarit/aoc/util"
 	"strings"
 	"unicode"
 )
 
 func run() {
-	file, err := os.Open("input")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	input := util.ReadInput()
 
-	var inputArray []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		inputArray = append(inputArray, scanner.Text())
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
-	println(trebuchet_part_1(inputArray))
-	println(trebuchet_part_2(inputArray))
+	println(trebuchetPart1(input))
+	println(trebuchetPart2(input))
 }
 
-func trebuchet_part_1(input []string) int {
+func trebuchetPart1(input []string) int {
 	result := 0
 
 	for _, entry := range input {
@@ -51,7 +35,7 @@ func trebuchet_part_1(input []string) int {
 	return result
 }
 
-func trebuchet_part_2(input []string) int {
+func trebuchetPart2(input []string) int {
 	result := 0
 
 	for _, entry := range input {
