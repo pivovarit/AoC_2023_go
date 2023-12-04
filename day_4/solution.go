@@ -18,6 +18,9 @@ func run() {
 	util.Timed("scratchCardsPart2", func() {
 		println(scratchCardsPart2(input))
 	})
+	util.Timed("scratchCardsPart2_optimized", func() {
+		println(scratchCardsPart2_optimized(input))
+	})
 }
 
 func scratchCardsPart1(input []string) int {
@@ -34,30 +37,23 @@ func scratchCardsPart1(input []string) int {
 }
 
 func scratchCardsPart2(input []string) int {
-	var sum = 0
-	var cards []card
-	for _, line := range input {
+	cardsCount := make(map[int]int)
+	for idx, line := range input {
 		p := parser{line}
-		cards = append(cards, p.card())
-	}
-	var results = make(map[int]int)
-	for _, c := range cards {
-		sum += count(cards, c, results)
-	}
-	return sum
-}
+		card := p.card()
 
-func count(deck []card, crd card, results map[int]int) int {
-	var sum = 1
-	for i := crd.id; i < crd.id+crd.matches(); i++ {
-		if i < len(deck) {
-			if val, ok := results[crd.id]; ok {
-				return val
-			}
-			sum += count(deck, deck[i], results)
+		cardNum := idx + 1
+		cardsCount[cardNum]++
+		for i := 1; i <= card.matches(); i++ {
+			cardsCount[cardNum+i] += cardsCount[cardNum]
 		}
 	}
-	results[crd.id] = sum
+
+	var sum int
+	for _, count := range cardsCount {
+		sum += count
+	}
+
 	return sum
 }
 
