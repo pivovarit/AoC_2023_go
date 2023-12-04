@@ -13,8 +13,12 @@ var partNumberPattern = regexp.MustCompile(`\d+`)
 func run() {
 	input := util.ReadInput()
 
-	println(gearRatiosPart1(input))
-	println(gearRatiosPart2(input))
+	util.Timed("gearRatiosPart1", func() {
+		println(gearRatiosPart1(input))
+	})
+	util.Timed("gearRatiosPart2", func() {
+		println(gearRatiosPart2(input))
+	})
 }
 
 func gearRatiosPart1(input []string) int {
