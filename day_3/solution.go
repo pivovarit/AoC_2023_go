@@ -35,40 +35,12 @@ func gearRatiosPart1(input []string) int {
 }
 
 func findGears(part GearPart, input []string) []GearLocation {
-	var gears []GearLocation
-	found, row, col := findGearInRow(part, input, part.row-1)
-	if found {
-		gears = append(gears, GearLocation{
-			row: row,
-			col: col,
-		})
-	}
-
-	found, row, col = findGearInRow(part, input, part.row+1)
-	if found {
-		gears = append(gears, GearLocation{
-			row: row,
-			col: col,
-		})
-	}
-
-	found, col = findGearAtIndex(input[part.row], part.start-1)
-	if found {
-		gears = append(gears, GearLocation{
-			row: part.row,
-			col: col,
-		})
-	}
-
-	found, col = findGearAtIndex(input[part.row], part.end)
-	if found {
-		gears = append(gears, GearLocation{
-			row: part.row,
-			col: col,
-		})
-	}
-
-	return gears
+	var gears = &[]GearLocation{}
+	findGearInRow(gears, part, input, part.row-1)
+	findGearInRow(gears, part, input, part.row+1)
+	findGearAtIndex(gears, input[part.row], part.start-1, part.row)
+	findGearAtIndex(gears, input[part.row], part.end, part.row)
+	return *gears
 }
 
 func gearRatiosPart2(input []string) int {
@@ -130,19 +102,20 @@ func extractPartsArray(entries []string) [][]GearPart {
 	return parts
 }
 
-func findGearInRow(part GearPart, input []string, index int) (bool, int, int) {
+func findGearInRow(gears *[]GearLocation, part GearPart, input []string, index int) {
 	if index >= 0 && index < len(input) {
 		start := int(math.Max(float64(part.start-1), 0))
 		end := int(math.Min(float64(part.end), float64(len(input[index])-1)))
 
 		for charIdx, char := range input[index][start : end+1] {
 			if char == '*' {
-				return true, index, charIdx + start
+				*gears = append(*gears, GearLocation{
+					row: index,
+					col: charIdx + start,
+				})
 			}
 		}
 	}
-
-	return false, 0, 0
 }
 
 func isLegit(part GearPart, input []string, index int) bool {
@@ -160,14 +133,15 @@ func isLegit(part GearPart, input []string, index int) bool {
 	return false
 }
 
-func findGearAtIndex(input string, index int) (bool, int) {
+func findGearAtIndex(gears *[]GearLocation, input string, index int, row int) {
 	if index >= 0 && index < len(input) {
 		if isSymbol(input[index]) {
-			return true, index
+			*gears = append(*gears, GearLocation{
+				row: row,
+				col: index,
+			})
 		}
 	}
-
-	return false, 0
 }
 
 func isLegitAtIndex(input string, index int) bool {
