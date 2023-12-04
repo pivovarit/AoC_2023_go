@@ -9,8 +9,12 @@ import (
 func run() {
 	input := util.ReadInput()
 
-	println(trebuchetPart1(input))
-	println(trebuchetPart2(input))
+	util.Timed("trebuchetPart1", func() {
+		println(trebuchetPart1(input))
+	})
+	util.Timed("trebuchetPart2", func() {
+		println(trebuchetPart2(input))
+	})
 }
 
 func trebuchetPart1(input []string) int {

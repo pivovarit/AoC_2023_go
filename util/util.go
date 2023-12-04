@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"time"
 )
 
 func ReadInput() []string {
@@ -23,4 +24,11 @@ func ReadInput() []string {
 		log.Fatal(err)
 	}
 	return inputArray
+}
+
+func Timed(name string, action func()) {
+	start := time.Now()
+	action()
+	elapsed := time.Since(start)
+	log.Printf("Execution time[%s]: %s", name, elapsed)
 }

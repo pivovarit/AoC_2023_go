@@ -12,8 +12,12 @@ import (
 func run() {
 	input := util.ReadInput()
 
-	println(scratchCardsPart1(input))
-	println(scratchCardsPart2(input))
+	util.Timed("scratchCardsPart1", func() {
+		println(scratchCardsPart1(input))
+	})
+	util.Timed("scratchCardsPart2", func() {
+		println(scratchCardsPart2(input))
+	})
 }
 
 func scratchCardsPart1(input []string) int {
@@ -30,31 +34,30 @@ func scratchCardsPart1(input []string) int {
 }
 
 func scratchCardsPart2(input []string) int {
-	var results = make(map[int]int)
 	var sum = 0
 	var cards []card
 	for _, line := range input {
 		p := parser{line}
 		cards = append(cards, p.card())
 	}
+	var results = make(map[int]int)
 	for _, c := range cards {
 		sum += count(cards, c, results)
 	}
 	return sum
 }
 
-func count(deck []card, crd card, partials map[int]int) int {
+func count(deck []card, crd card, results map[int]int) int {
 	var sum = 1
 	for i := crd.id; i < crd.id+crd.matches(); i++ {
 		if i < len(deck) {
-			if val, ok := partials[crd.id]; ok {
+			if val, ok := results[crd.id]; ok {
 				return val
 			}
-			result := count(deck, deck[i], partials)
-			sum += result
+			sum += count(deck, deck[i], results)
 		}
 	}
-	partials[crd.id] = sum
+	results[crd.id] = sum
 	return sum
 }
 
