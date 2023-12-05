@@ -12,14 +12,14 @@ import (
 func run() {
 	input := util.ReadInput()
 
-	util.Timed("scratchCardsPart1", func() {
-		println(scratchCardsPart1(input))
+	util.Timed("scratchCardsPart1", func() int {
+		return scratchCardsPart1(input)
 	})
-	util.Timed("scratchCardsPart2", func() {
-		println(scratchCardsPart2(input))
+	util.Timed("scratchCardsPart2", func() int {
+		return scratchCardsPart2(input)
 	})
-	util.Timed("scratchCardsPart2_optimized", func() {
-		println(scratchCardsPart2_optimized(input))
+	util.Timed("scratchCardsPart2_optimized", func() int {
+		return scratchCardsPart2_optimized(input)
 	})
 }
 
