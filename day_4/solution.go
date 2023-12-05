@@ -37,23 +37,30 @@ func scratchCardsPart1(input []string) int {
 }
 
 func scratchCardsPart2(input []string) int {
-	cardsCount := make(map[int]int)
-	for idx, line := range input {
+	var sum = 0
+	var cards []card
+	for _, line := range input {
 		p := parser{line}
-		card := p.card()
+		cards = append(cards, p.card())
+	}
+	var results = make(map[int]int)
+	for _, c := range cards {
+		sum += count(cards, c, results)
+	}
+	return sum
+}
 
-		cardNum := idx + 1
-		cardsCount[cardNum]++
-		for i := 1; i <= card.matches(); i++ {
-			cardsCount[cardNum+i] += cardsCount[cardNum]
+func count(deck []card, crd card, results map[int]int) int {
+	var sum = 1
+	for i := crd.id; i < crd.id+crd.matches(); i++ {
+		if i < len(deck) {
+			if val, ok := results[crd.id]; ok {
+				return val
+			}
+			sum += count(deck, deck[i], results)
 		}
 	}
-
-	var sum int
-	for _, count := range cardsCount {
-		sum += count
-	}
-
+	results[crd.id] = sum
 	return sum
 }
 
