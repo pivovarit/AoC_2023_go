@@ -17,11 +17,11 @@ const (
 func run() {
 	input := util.ReadInput()
 
-	util.Timed("cubeConundrumPart1", func() {
-		println(cubeConundrumPart1(input))
+	util.Timed("cubeConundrumPart1", func() int {
+		return cubeConundrumPart1(input)
 	})
-	util.Timed("cubeConundrumPart1", func() {
-		println(cubeConundrumPart2(input))
+	util.Timed("cubeConundrumPart1", func() int {
+		return cubeConundrumPart2(input)
 	})
 }
 

@@ -26,9 +26,9 @@ func ReadInput() []string {
 	return inputArray
 }
 
-func Timed(name string, action func()) {
+func Timed(name string, action func() int) {
 	start := time.Now()
-	action()
+	result := action()
 	elapsed := time.Since(start)
-	log.Printf("Execution time[%s]: %s", name, elapsed)
+	log.Printf("%s() result: %d, execution time: %s", name, result, elapsed)
 }
