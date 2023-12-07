@@ -89,6 +89,7 @@ With this map, you can look up the soil number required for each initial seed nu
 - Seed number 14 corresponds to soil number 14.
 - Seed number 55 corresponds to soil number 57.
 - Seed number 13 corresponds to soil number 13.
+
 The gardener and his team want to get started as soon as possible, so they'd like to know the closest location that needs a seed. Using these maps, find the lowest location number that corresponds to any of the initial seeds. To do this, you'll need to convert each seed number through other categories until you can find its corresponding location number. In this example, the corresponding types are:
 
 - Seed 79, soil 81, fertilizer 81, water 81, light 74, temperature 78, humidity 78, location 82.

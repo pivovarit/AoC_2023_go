@@ -148,3 +148,26 @@ func Test_fertilizerPart2(t *testing.T) {
 		})
 	}
 }
+
+func Test_subtract(t *testing.T) {
+	type args struct {
+		r1     Range
+		ranges []Range
+	}
+	tests := []struct {
+		name string
+		args args
+		want []Range
+	}{
+		{name: "no_overlap", args: args{r1: Range{1, 5}, ranges: []Range{{7, 10}}}, want: []Range{{1, 5}}},
+		{name: "overlap", args: args{r1: Range{1, 10}, ranges: []Range{{7, 15}}}, want: []Range{{1, 7}}},
+		{name: "full_overlap", args: args{r1: Range{1, 10}, ranges: []Range{{3, 7}}}, want: []Range{{1, 3}, {7, 10}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := subtract(tt.args.r1, tt.args.ranges); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("subtract() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

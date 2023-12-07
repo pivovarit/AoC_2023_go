@@ -1,13 +1,11 @@
 package day5
 
 import (
-	"fmt"
 	"github.com/pivovarit/aoc/util"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 func run() {
@@ -31,11 +29,18 @@ type Range struct {
 	end   int
 }
 
+func (r *Range) offset(offset int) Range {
+	return Range{
+		start: r.start + offset,
+		end:   r.end + offset,
+	}
+}
+
 func almanacPart1(input []string) int {
 	parser := Parser{Tokenizer{input: input}}
 	state := parser.parse()
 
-	var locations = make([]int, 0)
+	var minLocation = math.MaxInt
 	for _, seed := range state.seeds {
 		soil := lookup(seed, state.seedToSoil)
 		fertilizer := lookup(soil, state.soilToFertilizer)
@@ -45,54 +50,81 @@ func almanacPart1(input []string) int {
 		humidity := lookup(temperature, state.temperatureToHumidity)
 		location := lookup(humidity, state.humidityToLocation)
 
-		locations = append(locations, location)
+		minLocation = min(minLocation, location)
 	}
 
-	sort.Ints(locations)
-
-	return locations[0]
+	return minLocation
 }
 
 func almanacPart2(input []string) int {
 	parser := Parser{Tokenizer{input: input}}
 	state := parser.parse()
-	seedRanges := expand(state.seeds)
+	seedRanges := asRanges(state.seeds)
+	soilRanges := mapRanges(seedRanges, state.seedToSoil)
+	fertilizerRanges := mapRanges(soilRanges, state.soilToFertilizer)
+	waterRanges := mapRanges(fertilizerRanges, state.fertilizerToWater)
+	lightRanges := mapRanges(waterRanges, state.waterToLight)
+	temperatureRanges := mapRanges(lightRanges, state.lightToTemperature)
+	humidityRanges := mapRanges(temperatureRanges, state.temperatureToHumidity)
+	locationRanges := mapRanges(humidityRanges, state.humidityToLocation)
 
 	var minLocation = math.MaxInt
-
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-
-	for idx, seeds := range seedRanges {
-		wg.Add(1)
-		go func(idx int, seeds []int) {
-			defer wg.Done()
-			fmt.Printf("Seed range: %d, start: %d, count: %d\n", idx, seeds[0], len(seeds))
-
-			var localMin = math.MaxInt
-
-			for _, seed := range seeds {
-				soil := lookup(seed, state.seedToSoil)
-				fertilizer := lookup(soil, state.soilToFertilizer)
-				water := lookup(fertilizer, state.fertilizerToWater)
-				light := lookup(water, state.waterToLight)
-				temperature := lookup(light, state.lightToTemperature)
-				humidity := lookup(temperature, state.temperatureToHumidity)
-				location := lookup(humidity, state.humidityToLocation)
-
-				localMin = int(math.Min(float64(localMin), float64(location)))
-			}
-			fmt.Printf("Seed range: %d, minLocation: %d\n", idx, localMin)
-
-			mu.Lock()
-			minLocation = int(math.Min(float64(localMin), float64(minLocation)))
-			mu.Unlock()
-		}(idx, seeds)
+	for _, location := range locationRanges {
+		minLocation = min(minLocation, location.start)
 	}
 
-	wg.Wait()
-
 	return minLocation
+}
+
+func mapRanges(from []Range, to []AlmanacMap) []Range {
+	var mapped = make([]Range, 0)
+	for _, r1 := range from {
+		var mappings []Range
+		for _, r2 := range to {
+			source, overlaps := intersection(r1, r2.SourceRange)
+			if overlaps {
+				diff := r2.DestinationRange.start - r2.SourceRange.start
+				mapped = append(mapped, source.offset(diff))
+				mappings = append(mappings, source)
+			}
+		}
+
+		mapped = append(mapped, subtract(r1, mappings)...)
+	}
+	return mapped
+}
+
+func subtract(r1 Range, ranges []Range) []Range {
+	remaining := []Range{r1}
+
+	for _, r2 := range ranges {
+		var newResult []Range
+
+		for _, current := range remaining {
+			if r2.end <= current.start || r2.start >= current.end {
+				newResult = append(newResult, current)
+			} else {
+				if r2.start > current.start {
+					newResult = append(newResult, Range{current.start, r2.start})
+				}
+				if r2.end < current.end {
+					newResult = append(newResult, Range{r2.end, current.end})
+				}
+			}
+		}
+
+		remaining = newResult
+	}
+
+	return remaining
+}
+
+func intersection(r1 Range, r2 Range) (Range, bool) {
+	if r1.start > r2.end || r2.start > r1.end {
+		return Range{}, false
+	}
+
+	return Range{max(r1.start, r2.start), min(r1.end, r2.end)}, true
 }
 
 func lookup(key int, mappings []AlmanacMap) int {
@@ -105,24 +137,16 @@ func lookup(key int, mappings []AlmanacMap) int {
 	return key
 }
 
-func unroll(start int, count int) []int {
-	var seeds = make([]int, 0)
-	for seed := start; seed < start+count; seed++ {
-		seeds = append(seeds, seed)
-	}
-	return seeds
-}
+func asRanges(seeds []int) []Range {
+	var ranges = make([]Range, 0)
 
-func expand(seedRanges []int) [][]int {
-	if len(seedRanges)%2 != 0 {
-		panic("expecting even seed ranges")
+	for i := 0; i < len(seeds); i += 2 {
+		ranges = append(ranges, Range{
+			start: seeds[i],
+			end:   seeds[i] + seeds[i+1],
+		})
 	}
-
-	var seeds = make([][]int, 0)
-	for i := 0; i < len(seedRanges); i += 2 {
-		seeds = append(seeds, unroll(seedRanges[i], seedRanges[i+1]))
-	}
-	return seeds
+	return ranges
 }
 
 type Parser struct {
