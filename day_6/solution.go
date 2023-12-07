@@ -2,6 +2,7 @@ package day6
 
 import (
 	"github.com/pivovarit/aoc/util"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -31,21 +32,9 @@ func waitForIt(races []Race) int {
 	var result = 0
 
 	for _, race := range races {
-		var raceResults = make([]int, race.time+1)
-		for buttonTime := 0; buttonTime <= race.time; buttonTime++ {
-			if buttonTime == 0 || buttonTime == race.time {
-				raceResults[buttonTime] = 0
-			} else {
-				raceResults[buttonTime] = (race.time - buttonTime) * buttonTime
-			}
-		}
-
-		wins := 0
-		for _, raceResult := range raceResults {
-			if raceResult > race.record {
-				wins++
-			}
-		}
+		xFrom := int(math.Floor((float64(-race.time)+math.Sqrt(float64((race.time*race.time)-4*-1*-race.record)))/-2) + 1)
+		xTo := int(math.Ceil((float64(-race.time)-math.Sqrt(float64((race.time*race.time)-4*-1*-race.record)))/-2) - 1)
+		wins := xTo - xFrom + 1
 
 		if result == 0 {
 			result = wins
