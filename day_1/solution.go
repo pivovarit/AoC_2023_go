@@ -2,7 +2,6 @@ package day1
 
 import (
 	"github.com/pivovarit/aoc/util"
-	"slices"
 	"unicode"
 )
 
@@ -52,7 +51,7 @@ func trebuchetPart2(input []string) int {
 			if unicode.IsDigit(char) {
 				digits[0] = int(char - '0')
 				break
-			} else if slices.Contains(firstChars, uint8(char)) {
+			} else if isInFirstChars(uint8(char)) {
 				digit, found := getDigits(idx, entry)
 				if found {
 					digits[0] = digit
@@ -66,7 +65,7 @@ func trebuchetPart2(input []string) int {
 			if unicode.IsDigit(rune(char)) {
 				digits[1] = int(char - '0')
 				break
-			} else if slices.Contains(lastChars, char) {
+			} else if isInLastChars(char) {
 				digit, found := getDigitsBackwards(idx, entry)
 				if found {
 					digits[1] = digit
@@ -80,8 +79,7 @@ func trebuchetPart2(input []string) int {
 	return result
 }
 
-var firstChars = []uint8{'o', 't', 'f', 's', 'e', 'n'}
-var lastChars = []uint8{'e', 'n', 'o', 'r', 't', 'x'}
+var wordsToNumbersKeys = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
 var wordsToNumbers = map[string]int{
 	"one":   1,
@@ -95,9 +93,47 @@ var wordsToNumbers = map[string]int{
 	"nine":  9,
 }
 
+func isInFirstChars(char uint8) bool {
+	switch char {
+	case 'e':
+		return true
+	case 'f':
+		return true
+	case 'n':
+		return true
+	case 'o':
+		return true
+	case 's':
+		return true
+	case 't':
+		return true
+	default:
+		return false
+	}
+}
+
+func isInLastChars(char uint8) bool {
+	switch char {
+	case 'e':
+		return true
+	case 'n':
+		return true
+	case 'o':
+		return true
+	case 'r':
+		return true
+	case 't':
+		return true
+	case 'x':
+		return true
+	default:
+		return false
+	}
+}
+
 func getDigits(idx int, entry string) (int, bool) {
 	adjustedEntryLength := len(entry) - idx
-	for word := range wordsToNumbers {
+	for _, word := range wordsToNumbersKeys {
 		if len(word) <= adjustedEntryLength && word[0] == entry[idx] {
 			match := true
 			for i := range word {
@@ -116,7 +152,7 @@ func getDigits(idx int, entry string) (int, bool) {
 
 func getDigitsBackwards(idx int, entry string) (int, bool) {
 	adjustedEntryLength := len(entry) - idx
-	for word := range wordsToNumbers {
+	for _, word := range wordsToNumbersKeys {
 		if len(word) <= adjustedEntryLength && word[len(word)-1] == entry[len(entry)-1-idx] {
 			match := true
 			for i := range word {
