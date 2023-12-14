@@ -2,6 +2,7 @@ package day1
 
 import (
 	"github.com/pivovarit/aoc/util"
+	"slices"
 	"unicode"
 )
 
@@ -23,12 +24,16 @@ func trebuchetPart1(input []string) int {
 		var digits = [2]int{-1, -1}
 		for _, char := range entry {
 			if unicode.IsDigit(char) {
-				digit := char - '0'
-				if digits[0] == -1 {
-					digits[0] = int(digit)
-				}
+				digits[0] = int(char - '0')
+				break
+			}
+		}
 
-				digits[1] = int(digit)
+		for idx := range entry {
+			char := entry[len(entry)-1-idx]
+			if unicode.IsDigit(rune(char)) {
+				digits[1] = int(char - '0')
+				break
 			}
 		}
 
@@ -45,39 +50,38 @@ func trebuchetPart2(input []string) int {
 		var digits = [2]int{-1, -1}
 		for idx, char := range entry {
 			if unicode.IsDigit(char) {
-				digit := char - '0'
-				if digits[0] == -1 {
-					digits[0] = int(digit)
-				}
-
-				digits[1] = int(digit)
-			} else if maybeWord(char) {
-				digit := getDigits(idx, entry)
-				if digit != 0 {
-					if digits[0] == -1 {
-						digits[0] = digit
-					}
-					digits[1] = digit
+				digits[0] = int(char - '0')
+				break
+			} else if slices.Contains(firstChars, uint8(char)) {
+				digit, found := getDigits(idx, entry)
+				if found {
+					digits[0] = digit
+					break
 				}
 			}
 		}
 
+		for idx := range entry {
+			char := entry[len(entry)-1-idx]
+			if unicode.IsDigit(rune(char)) {
+				digits[1] = int(char - '0')
+				break
+			} else if slices.Contains(lastChars, char) {
+				digit, found := getDigitsBackwards(idx, entry)
+				if found {
+					digits[1] = digit
+					break
+				}
+			}
+		}
 		result += digits[0]*10 + digits[1]
 	}
 
 	return result
 }
 
-var firstChars = []int32{'o', 't', 'f', 's', 'e', 'n'}
-
-func maybeWord(char int32) bool {
-	for _, c := range firstChars {
-		if c == char {
-			return true
-		}
-	}
-	return false
-}
+var firstChars = []uint8{'o', 't', 'f', 's', 'e', 'n'}
+var lastChars = []uint8{'e', 'n', 'o', 'r', 't', 'x'}
 
 var wordsToNumbers = map[string]int{
 	"one":   1,
@@ -91,7 +95,7 @@ var wordsToNumbers = map[string]int{
 	"nine":  9,
 }
 
-func getDigits(idx int, entry string) int {
+func getDigits(idx int, entry string) (int, bool) {
 	adjustedEntryLength := len(entry) - idx
 	for word := range wordsToNumbers {
 		if len(word) <= adjustedEntryLength && word[0] == entry[idx] {
@@ -103,9 +107,28 @@ func getDigits(idx int, entry string) int {
 				}
 			}
 			if match {
-				return wordsToNumbers[word]
+				return wordsToNumbers[word], true
 			}
 		}
 	}
-	return 0
+	return 0, false
+}
+
+func getDigitsBackwards(idx int, entry string) (int, bool) {
+	adjustedEntryLength := len(entry) - idx
+	for word := range wordsToNumbers {
+		if len(word) <= adjustedEntryLength && word[len(word)-1] == entry[len(entry)-1-idx] {
+			match := true
+			for i := range word {
+				if entry[len(entry)-1-idx-i] != word[len(word)-1-i] {
+					match = false
+					break
+				}
+			}
+			if match {
+				return wordsToNumbers[word], true
+			}
+		}
+	}
+	return 0, false
 }
