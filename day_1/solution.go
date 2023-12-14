@@ -2,7 +2,6 @@ package day1
 
 import (
 	"github.com/pivovarit/aoc/util"
-	"strings"
 	"unicode"
 )
 
@@ -52,8 +51,8 @@ func trebuchetPart2(input []string) int {
 				}
 
 				digits[1] = int(digit)
-			} else {
-				digit := getDigits(entry[idx:])
+			} else if maybeWord(char) {
+				digit := getDigits(idx, entry)
 				if digit != 0 {
 					if digits[0] == -1 {
 						digits[0] = digit
@@ -69,22 +68,43 @@ func trebuchetPart2(input []string) int {
 	return result
 }
 
-func getDigits(entry string) int {
-	wordsToNumbers := map[string]int{
-		"one":   1,
-		"two":   2,
-		"three": 3,
-		"four":  4,
-		"five":  5,
-		"six":   6,
-		"seven": 7,
-		"eight": 8,
-		"nine":  9,
-	}
+var firstChars = []int32{'o', 't', 'f', 's', 'e', 'n'}
 
+func maybeWord(char int32) bool {
+	for _, c := range firstChars {
+		if c == char {
+			return true
+		}
+	}
+	return false
+}
+
+var wordsToNumbers = map[string]int{
+	"one":   1,
+	"two":   2,
+	"three": 3,
+	"four":  4,
+	"five":  5,
+	"six":   6,
+	"seven": 7,
+	"eight": 8,
+	"nine":  9,
+}
+
+func getDigits(idx int, entry string) int {
+	adjustedEntryLength := len(entry) - idx
 	for word := range wordsToNumbers {
-		if strings.Index(entry, word) == 0 {
-			return wordsToNumbers[word]
+		if len(word) <= adjustedEntryLength && word[0] == entry[idx] {
+			match := true
+			for i := range word {
+				if entry[i+idx] != word[i] {
+					match = false
+					break
+				}
+			}
+			if match {
+				return wordsToNumbers[word]
+			}
 		}
 	}
 	return 0
