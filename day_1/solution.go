@@ -2,7 +2,6 @@ package day1
 
 import (
 	"github.com/pivovarit/aoc/util"
-	"unicode"
 )
 
 func run() {
@@ -22,7 +21,7 @@ func trebuchetPart1(input []string) int {
 	for _, entry := range input {
 		var digits = [2]int{-1, -1}
 		for _, char := range entry {
-			if unicode.IsDigit(char) {
+			if isDigit(char) {
 				digits[0] = int(char - '0')
 				break
 			}
@@ -30,7 +29,7 @@ func trebuchetPart1(input []string) int {
 
 		for idx := range entry {
 			char := entry[len(entry)-1-idx]
-			if unicode.IsDigit(rune(char)) {
+			if isDigit(rune(char)) {
 				digits[1] = int(char - '0')
 				break
 			}
@@ -48,7 +47,7 @@ func trebuchetPart2(input []string) int {
 	for _, entry := range input {
 		var digits = [2]int{-1, -1}
 		for idx, char := range entry {
-			if unicode.IsDigit(char) {
+			if isDigit(char) {
 				digits[0] = int(char - '0')
 				break
 			} else if isInFirstChars(uint8(char)) {
@@ -62,7 +61,7 @@ func trebuchetPart2(input []string) int {
 
 		for idx := range entry {
 			char := entry[len(entry)-1-idx]
-			if unicode.IsDigit(rune(char)) {
+			if isDigit(rune(char)) {
 				digits[1] = int(char - '0')
 				break
 			} else if isInLastChars(char) {
@@ -167,4 +166,8 @@ func getDigitsBackwards(idx int, entry string) (int, bool) {
 		}
 	}
 	return 0, false
+}
+
+func isDigit(r rune) bool {
+	return '0' <= r && r <= '9'
 }
