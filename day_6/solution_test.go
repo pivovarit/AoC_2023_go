@@ -1,6 +1,7 @@
 package day6
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
@@ -10,8 +11,22 @@ var example = []string{
 	"Distance:  9  40  200",
 }
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkWaitForItPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		waitForItPart1(input)
+	}
+}
+
+func BenchmarkWaitForItPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		waitForItPart2(input)
+	}
 }
 
 func TestParser_parse(t *testing.T) {

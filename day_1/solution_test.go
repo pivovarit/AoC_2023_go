@@ -1,9 +1,26 @@
 package day1
 
-import "testing"
+import (
+	"github.com/pivovarit/aoc/util"
+	"testing"
+)
+
+var input = util.ReadInput()
 
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkTrebuchetPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		trebuchetPart1(input)
+	}
+}
+
+func BenchmarkTrebuchetPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		trebuchetPart2(input)
+	}
 }
 
 func Test_trebuchetPart1(t *testing.T) {

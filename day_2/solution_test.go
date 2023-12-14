@@ -1,12 +1,27 @@
 package day2
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkCubeConundrumPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		cubeConundrumPart1(input)
+	}
+}
+
+func BenchmarkCubeConundrumPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		cubeConundrumPart2(input)
+	}
 }
 
 func Test_cubeConundrum(t *testing.T) {

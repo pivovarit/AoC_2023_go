@@ -1,12 +1,27 @@
 package day3
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkGearRatiosPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		gearRatiosPart1(input)
+	}
+}
+
+func BenchmarkGearRatiosPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		gearRatiosPart2(input)
+	}
 }
 
 func Test_gearRatiosPart1(t *testing.T) {
