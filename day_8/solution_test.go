@@ -1,12 +1,27 @@
 package day8
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkHauntedWasteLandPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		hauntedWasteLandPart1(input)
+	}
+}
+
+func BenchmarkHauntedWasteLandPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		hauntedWasteLandPart2(input)
+	}
 }
 
 func Test_hauntedWasteLandPart1(t *testing.T) {

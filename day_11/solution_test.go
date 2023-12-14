@@ -1,11 +1,26 @@
 package day11
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
-	run() // 9693756
+	run()
+}
+
+func BenchmarkCosmicExpansionPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		cosmicExpansionPart1(input)
+	}
+}
+
+func BenchmarkCosmicExpansionPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		cosmicExpansionPart2(input)
+	}
 }
 
 func Test_cosmicExpansionPart1(t *testing.T) {

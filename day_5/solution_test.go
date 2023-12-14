@@ -1,12 +1,27 @@
 package day5
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkAlmanacPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		almanacPart1(input)
+	}
+}
+
+func BenchmarkAlmanacPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		almanacPart2(input)
+	}
 }
 
 var example = []string{
@@ -109,7 +124,7 @@ func TestParser_parse(t *testing.T) {
 	}
 }
 
-func Test_fertilizerPart1(t *testing.T) {
+func Test_almanacPart1(t *testing.T) {
 	type args struct {
 		input []string
 	}
@@ -129,7 +144,7 @@ func Test_fertilizerPart1(t *testing.T) {
 	}
 }
 
-func Test_fertilizerPart2(t *testing.T) {
+func Test_almanacPart2(t *testing.T) {
 	type args struct {
 		input []string
 	}

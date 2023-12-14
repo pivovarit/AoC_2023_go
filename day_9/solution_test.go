@@ -1,11 +1,26 @@
 package day9
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkMirageMaintenancePart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		mirageMaintenancePart1(input)
+	}
+}
+
+func BenchmarkMirageMaintenancePart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		mirageMaintenancePart2(input)
+	}
 }
 
 func Test_mirageMaintenancePart1(t *testing.T) {

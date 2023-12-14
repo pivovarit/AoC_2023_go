@@ -1,12 +1,27 @@
 package day4
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"reflect"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkScratchCardsPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		scratchCardsPart1(input)
+	}
+}
+
+func BenchmarkScratchCardsPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		scratchCardsPart2_optimized(input)
+	}
 }
 
 func Test_scratchCardsPart1(t *testing.T) {
@@ -152,7 +167,7 @@ func Test_scratchCardsPart2(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := scratchCardsPart2(tt.args.input); got != tt.want {
+			if got := scratchCardsPart2_optimized(tt.args.input); got != tt.want {
 				t.Errorf("scratchCardsPart2() = %v, want %v", got, tt.want)
 			}
 		})

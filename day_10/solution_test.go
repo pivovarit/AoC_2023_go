@@ -1,11 +1,26 @@
 package day10
 
 import (
+	"github.com/pivovarit/aoc/util"
 	"testing"
 )
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkPipeMazePart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		pipeMazePart1(input)
+	}
+}
+
+func BenchmarkPipeMazePart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		pipeMazePart2(input)
+	}
 }
 
 func Test_pipeMazePart1(t *testing.T) {

@@ -2,6 +2,7 @@ package day7
 
 import (
 	"fmt"
+	"github.com/pivovarit/aoc/util"
 	"testing"
 )
 
@@ -13,8 +14,22 @@ var example = []string{
 	"QQQJA 483",
 }
 
+var input = util.ReadInput()
+
 func Test_run(t *testing.T) {
 	run()
+}
+
+func BenchmarkCamelCardsPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		camelCardsPart1(input)
+	}
+}
+
+func BenchmarkCamelCardsPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		camelCardsPart2(input)
+	}
 }
 
 func Test_camelCardsPart1(t *testing.T) {
