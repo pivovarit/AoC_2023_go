@@ -4,6 +4,16 @@ import (
 	"github.com/pivovarit/aoc/util"
 )
 
+var numberHashToInt = getNumberStringBuckets()
+
+func hash(s *string) int {
+	return int((*s)[1]+(*s)[2]) - 208
+}
+
+func getNumberStringBuckets() [23]int {
+	return [23]int{8, -1, -2, 1, -1, -1, -1, 9, -1, -1, 3, 8, -1, -1, -1, 5, -1, 6, -1, -1, 4, -1, 2}
+}
+
 func run() {
 	input := util.ReadInput()
 
@@ -50,7 +60,7 @@ func trebuchetPart2(input []string) int {
 			if isDigit(char) {
 				digits[0] = int(char - '0')
 				break
-			} else if isInFirstChars(uint8(char)) {
+			} else if isInFirstChars(&char) {
 				digit, found := getDigits(idx, entry)
 				if found {
 					digits[0] = digit
@@ -59,12 +69,14 @@ func trebuchetPart2(input []string) int {
 			}
 		}
 
+		entryLength := len(entry)
 		for idx := range entry {
-			char := entry[len(entry)-1-idx]
-			if isDigit(rune(char)) {
+			char := entry[entryLength-1-idx]
+			r := rune(char)
+			if isDigit(r) {
 				digits[1] = int(char - '0')
 				break
-			} else if isInLastChars(char) {
+			} else if isInLastChars(&char) {
 				digit, found := getDigitsBackwards(idx, entry)
 				if found {
 					digits[1] = digit
@@ -80,20 +92,8 @@ func trebuchetPart2(input []string) int {
 
 var wordsToNumbersKeys = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
-var wordsToNumbers = map[string]int{
-	"one":   1,
-	"two":   2,
-	"three": 3,
-	"four":  4,
-	"five":  5,
-	"six":   6,
-	"seven": 7,
-	"eight": 8,
-	"nine":  9,
-}
-
-func isInFirstChars(char uint8) bool {
-	switch char {
+func isInFirstChars(char *int32) bool {
+	switch *char {
 	case 'e':
 		return true
 	case 'f':
@@ -111,8 +111,8 @@ func isInFirstChars(char uint8) bool {
 	}
 }
 
-func isInLastChars(char uint8) bool {
-	switch char {
+func isInLastChars(char *uint8) bool {
+	switch *char {
 	case 'e':
 		return true
 	case 'n':
@@ -142,7 +142,7 @@ func getDigits(idx int, entry string) (int, bool) {
 				}
 			}
 			if match {
-				return wordsToNumbers[word], true
+				return numberHashToInt[hash(&word)], true
 			}
 		}
 	}
@@ -150,18 +150,19 @@ func getDigits(idx int, entry string) (int, bool) {
 }
 
 func getDigitsBackwards(idx int, entry string) (int, bool) {
-	adjustedEntryLength := len(entry) - idx
+	entryLength := len(entry)
+	adjustedEntryLength := entryLength - idx
 	for _, word := range wordsToNumbersKeys {
-		if len(word) <= adjustedEntryLength && word[len(word)-1] == entry[len(entry)-1-idx] {
+		if len(word) <= adjustedEntryLength && word[len(word)-1] == entry[entryLength-1-idx] {
 			match := true
 			for i := range word {
-				if entry[len(entry)-1-idx-i] != word[len(word)-1-i] {
+				if entry[entryLength-1-idx-i] != word[len(word)-1-i] {
 					match = false
 					break
 				}
 			}
 			if match {
-				return wordsToNumbers[word], true
+				return numberHashToInt[hash(&word)], true
 			}
 		}
 	}
