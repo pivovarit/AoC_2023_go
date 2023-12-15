@@ -79,6 +79,7 @@ func Test_trebuchetPart2(t *testing.T) {
 			"zoneight234",
 			"7pqrstsixteen",
 		}}, want: 281},
+		{name: "example", args: args{input: input}, want: 54824},
 	}
 
 	for _, tt := range tests {
