@@ -3,7 +3,7 @@ package day22
 import (
 	"fmt"
 	"github.com/pivovarit/aoc/util"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -24,98 +24,24 @@ type (
 		x, y, z int
 	}
 	Cube struct {
-		id       int
 		from, to Coordinates
 	}
 )
 
 func sandSlabsPart1(input []string) int {
-	cubes := getSettled(parse(input))
-	count := 0
-	for idx := 0; idx < len(cubes); idx++ {
-		copiedSlice := make([]Cube, len(cubes))
-		copy(copiedSlice, cubes)
-		copiedSlice = append(copiedSlice[:idx], copiedSlice[idx+1:]...)
-		newCubeList := make([]Cube, len(copiedSlice))
-		copy(newCubeList, copiedSlice)
-		newCubeList = getSettled(newCubeList)
-		diff := false
-		for i := 0; i < len(copiedSlice); i++ {
-			for j := 0; j < len(newCubeList); j++ {
-				if copiedSlice[i].id == newCubeList[j].id {
-					if copiedSlice[i].from != newCubeList[j].from {
-						diff = true
-					}
-					break
-				}
-			}
-		}
-		if !diff {
-			count++
-		}
-	}
-	return count
+	cubes := parse(input)
+	settleAll(cubes)
+	return disintegrateCounting(cubes)
 }
 
 func sandSlabsPart2(input []string) int {
-	cubes := getSettled(parse(input))
-	diff := 0
-	for idx := 0; idx < len(cubes); idx++ {
-		copiedSlice := make([]Cube, len(cubes))
-		copy(copiedSlice, cubes)
-		copiedSlice = append(copiedSlice[:idx], copiedSlice[idx+1:]...)
-		newCubeList := make([]Cube, len(copiedSlice))
-		copy(newCubeList, copiedSlice)
-		newCubeList = getSettled(newCubeList)
-		for i := 0; i < len(copiedSlice); i++ {
-			for j := 0; j < len(newCubeList); j++ {
-				if copiedSlice[i].id == newCubeList[j].id {
-					if copiedSlice[i].from != newCubeList[j].from {
-						diff++
-					}
-					break
-				}
-			}
-		}
-	}
-	return diff
-}
-
-func getSettled(cubes []Cube) []Cube {
-	for {
-		finished := true
-		sort.Slice(cubes, func(i, j int) bool {
-			return cubes[i].from.z < cubes[j].from.z
-		})
-		for idx, brick := range cubes {
-			if brick.from.z > 0 {
-				var touch bool
-				for j := 0; j < idx; j++ {
-					touch = false
-					if cubes[j].to.z == brick.from.z-1 {
-						if brick.from.x <= cubes[j].to.x && brick.to.x >= cubes[j].from.x &&
-							brick.from.y <= cubes[j].to.y && brick.to.y >= cubes[j].from.y {
-							touch = true
-							break
-						}
-					}
-				}
-				if !touch {
-					finished = false
-					cubes[idx].from.z--
-					cubes[idx].to.z--
-				}
-			}
-		}
-		if finished {
-			break
-		}
-	}
-	return cubes
+	cubes := parse(input)
+	settleAll(cubes)
+	return disintegrateSumming(cubes)
 }
 
 func parse(input []string) (cubes []Cube) {
-	for idx, line := range input {
+	for _, line := range input {
 		split := strings.Split(line, "~")
 		from := strings.Split(split[0], ",")
 		to := strings.Split(split[1], ",")
@@ -123,9 +49,11 @@ func parse(input []string) (cubes []Cube) {
 		cubes = append(cubes, Cube{
 			from: Coordinates{asInt(from[0]), asInt(from[1]), asInt(from[2])},
 			to:   Coordinates{asInt(to[0]), asInt(to[1]), asInt(to[2])},
-			id:   idx,
 		})
 	}
+	slices.SortFunc(cubes, func(a, b Cube) int {
+		return a.from.z - b.from.z
+	})
 	return cubes
 }
 
@@ -135,4 +63,94 @@ func asInt(str string) int {
 		panic(fmt.Sprintf("str: %+v should be an int\n", str))
 	}
 	return result
+}
+
+func settle(xy [][]int, from, to Coordinates) (int, int) {
+	z1, z2 := 0, 0
+
+	if from.x == to.x && from.z == to.z {
+		for i := from.y; i <= to.y; i++ {
+			if xy[from.x][i] > z1 {
+				z1 = xy[from.x][i]
+			}
+		}
+
+		z1, z2 = z1+1, z1+1
+
+		for i := from.y; i <= to.y; i++ {
+			xy[from.x][i] = z1
+		}
+
+	} else if from.y == to.y && from.z == to.z {
+		for i := from.x; i <= to.x; i++ {
+			if xy[i][from.y] > z1 {
+				z1 = xy[i][from.y]
+			}
+		}
+
+		z1, z2 = z1+1, z1+1
+
+		for i := from.x; i <= to.x; i++ {
+			xy[i][from.y] = z1
+		}
+
+	} else if from.x == to.x && from.y == to.y {
+		z1 = xy[from.x][from.y] + 1
+		z2 = z1 + to.z - from.z
+		xy[from.x][from.y] = z2
+	}
+
+	return z1, z2
+}
+
+func disintegrateCounting(blocks []Cube) (count int) {
+	for i := range blocks {
+		newBlocks := make([]Cube, len(blocks))
+		copy(newBlocks, blocks)
+		if i == 0 {
+			newBlocks = newBlocks[1:]
+		} else if i == len(newBlocks)-1 {
+			newBlocks = blocks[:len(newBlocks)-1]
+		} else {
+			newBlocks = append(newBlocks[:i], newBlocks[i+1:]...)
+		}
+
+		if settleAll(newBlocks) == 0 {
+			count++
+		}
+	}
+	return count
+}
+
+func disintegrateSumming(blocks []Cube) (sum int) {
+	for i := range blocks {
+		newBlocks := make([]Cube, len(blocks))
+		copy(newBlocks, blocks)
+		if i == 0 {
+			newBlocks = newBlocks[1:]
+		} else if i == len(newBlocks)-1 {
+			newBlocks = blocks[:len(newBlocks)-1]
+		} else {
+			newBlocks = append(newBlocks[:i], newBlocks[i+1:]...)
+		}
+
+		sum += settleAll(newBlocks)
+	}
+	return sum
+}
+
+func settleAll(blocks []Cube) (count int) {
+	xy := make([][]int, 10)
+	for i := range xy {
+		xy[i] = make([]int, 10)
+	}
+
+	for i, b := range blocks {
+		b.from.z, b.to.z = settle(xy, b.from, b.to)
+		if b.from != blocks[i].from || b.to != blocks[i].to {
+			blocks[i] = Cube{b.from, b.to}
+			count++
+		}
+	}
+	return count
 }
